@@ -12,7 +12,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -82,10 +81,9 @@ public class EmployeeController {
     }
 
     @GetMapping("/page")
-    public R<Page> page(int page,int pageSize, String name){
-        log.info("page={}, pageSize={}, name={}", page, pageSize,name);
+    public R<Page<Employee>> page(int page,int pageSize, String name){
         // 分页构造器
-        Page pageInfo = new Page(page, pageSize);
+        Page<Employee> pageInfo = new Page<>(page, pageSize);
         // 条件构造器
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
         // 添加过滤条件
@@ -97,5 +95,23 @@ public class EmployeeController {
         employeeService.page(pageInfo, queryWrapper);
 
         return R.success(pageInfo);
+    }
+
+    @PutMapping
+    public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
+        Long empId =(Long) request.getSession().getAttribute("employee");
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(empId);
+        employeeService.updateById(employee);
+        return R.success("更新成功");
+    }
+
+    @GetMapping("/{empId}")
+    public R<Employee> getById(@PathVariable Long empId){
+        Employee employee = employeeService.getById(empId);
+        if(employee != null) {
+            return R.success(employee);
+        }
+        return R.error("员工不存在");
     }
 }
