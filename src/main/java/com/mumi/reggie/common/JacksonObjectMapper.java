@@ -52,3 +52,4 @@ public class JacksonObjectMapper extends ObjectMapper {
         this.registerModule(simpleModule);
     }
 }
+
