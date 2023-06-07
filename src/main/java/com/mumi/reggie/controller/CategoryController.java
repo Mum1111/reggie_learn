@@ -7,9 +7,7 @@ import com.mumi.reggie.entity.Category;
 import com.mumi.reggie.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/category")
@@ -32,5 +30,22 @@ public class CategoryController {
         categoryService.page(pageInfo,categoryWrapper);
 
         return R.success(pageInfo);
+    }
+
+    @PostMapping
+    public R<String> add(@RequestBody Category category) {
+        log.info("添加信息 {}", category.toString());
+
+        categoryService.save(category);
+
+        return R.success("添加成功");
+    }
+
+    @PutMapping
+    public R<String> update(@RequestBody Category category) {
+        log.info("修改信息 {}", category.toString());
+
+        categoryService.updateById(category);
+        return R.success("修改成功");
     }
 }
