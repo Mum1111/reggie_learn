@@ -48,4 +48,12 @@ public class CategoryController {
         categoryService.updateById(category);
         return R.success("修改成功");
     }
+
+    @DeleteMapping
+    public R<String> delete(Long ids) {
+        log.info("删除的id {}", ids);
+
+        categoryService.removeById(ids);
+        return R.success("删除成功");
+    }
 }
