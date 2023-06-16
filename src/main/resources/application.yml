@@ -20,9 +20,9 @@ mybatis-plus:
       id-type: ASSIGN_ID
 aliyun:
   oss:
-    endpoint: https://oss-cn-chengdu.aliyuncs.com
-    accessKeyId: LTAI5tDhPvrNGbuWEwoke9A2
-    accessKeySecret: 0mEQ5Iuz8ZxaKIbqfPhQcEywiUkdQG
-    bucketName: shihongjin-java-learn
+    endpoint:
+    accessKeyId:
+    accessKeySecret:
+    bucketName:
 reggie:
   path: D:\
