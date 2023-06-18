@@ -6,8 +6,8 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-#      url: jdbc:mysql://localhost:13306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      url: jdbc:mysql://localhost:3307/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://localhost:13306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+#      url: jdbc:mysql://localhost:3307/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root
       password: admin123
 mybatis-plus:
@@ -20,9 +20,9 @@ mybatis-plus:
       id-type: ASSIGN_ID
 aliyun:
   oss:
-    endpoint:
-    accessKeyId:
-    accessKeySecret:
-    bucketName:
+    endpoint: https://oss-cn-chengdu.aliyuncs.com
+    accessKeyId: LTAI5tDhPvrNGbuWEwoke9A2
+    accessKeySecret: 0mEQ5Iuz8ZxaKIbqfPhQcEywiUkdQG
+    bucketName: shihongjin-java-learn
 reggie:
   path: D:\
