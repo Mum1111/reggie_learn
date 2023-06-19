@@ -1,6 +1,8 @@
 package com.mumi.reggie.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mumi.reggie.common.CustomException;
 import com.mumi.reggie.dto.SetmealDto;
 import com.mumi.reggie.entity.Setmeal;
 import com.mumi.reggie.entity.SetmealDish;
@@ -34,5 +36,27 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         // 将数据存入setmealDish表
         setmealDishService.saveBatch(setmealDishes);
 
+    }
+
+    @Transactional
+    @Override
+    public void deleteWithDish(List<Long> ids) {
+
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Setmeal::getId, ids);
+        queryWrapper.eq(Setmeal::getStatus, 1);
+
+        int count = this.count(queryWrapper);
+
+        if (count > 0) {
+           throw new CustomException("已启用的套餐不能被删除");
+        }
+
+        this.removeByIds(ids);
+
+        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealDishLambdaQueryWrapper.in(SetmealDish::getSetmealId, ids);
+
+        setmealDishService.remove(setmealDishLambdaQueryWrapper);
     }
 }
