@@ -1,11 +1,15 @@
 package com.mumi.reggie.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mumi.reggie.common.R;
+import com.mumi.reggie.dto.SetmealDto;
+import com.mumi.reggie.entity.Setmeal;
 import com.mumi.reggie.service.SetmealDishService;
 import com.mumi.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/setmeal")
@@ -16,4 +20,22 @@ public class SetmealController {
 
     @Autowired
     private SetmealDishService setmealDishService;
+
+    @PostMapping
+    public R<String> save(@RequestBody SetmealDto setmealDto) {
+        setmealService.saveWithDish(setmealDto);
+        return R.success("添加套餐成功");
+    }
+
+    @GetMapping("/page")
+    public R<Page<Setmeal>> page(int page, int pageSize, String name){
+        Page<Setmeal> pageInfo = new Page<>(page, pageSize);
+
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(name != null, Setmeal::getName, name);
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+
+        setmealService.page(pageInfo, queryWrapper);
+        return R.success(pageInfo);
+    }
 }
