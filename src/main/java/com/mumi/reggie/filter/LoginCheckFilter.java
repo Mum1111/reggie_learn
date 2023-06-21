@@ -27,6 +27,7 @@ public class LoginCheckFilter implements Filter {
         String[] URLList = {
                 "/employee/logout",
                 "/employee/login",
+                "/user/sendMsg",
                 "/backend/**",
                 "/front/**",
                 "/common/**"

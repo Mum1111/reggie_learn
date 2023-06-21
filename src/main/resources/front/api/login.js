@@ -13,4 +13,12 @@ function loginoutApi() {
   })
 }
 
+function loadCode(data) {
+    return $axios({
+        'url': '/user/sendMsg',
+        'method': 'post',
+        data
+    })
+}
+
   
