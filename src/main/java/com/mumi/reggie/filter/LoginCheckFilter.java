@@ -28,6 +28,7 @@ public class LoginCheckFilter implements Filter {
                 "/employee/logout",
                 "/employee/login",
                 "/user/sendMsg",
+                "/user/login",
                 "/backend/**",
                 "/front/**",
                 "/common/**"
