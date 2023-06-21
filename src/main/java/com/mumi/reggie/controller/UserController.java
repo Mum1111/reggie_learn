@@ -64,7 +64,7 @@ public class UserController {
                 userService.save(user);
             }
 
-            httpSession.setAttribute("user", phone);
+            httpSession.setAttribute("user", user.getId());
 
             return R.success(user);
         }
