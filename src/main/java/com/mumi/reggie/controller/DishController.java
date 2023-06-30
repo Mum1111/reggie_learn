@@ -6,6 +6,7 @@ import com.mumi.reggie.common.R;
 import com.mumi.reggie.dto.DishDto;
 import com.mumi.reggie.entity.Category;
 import com.mumi.reggie.entity.Dish;
+import com.mumi.reggie.entity.DishFlavor;
 import com.mumi.reggie.service.CategoryService;
 import com.mumi.reggie.service.DishFlavorService;
 import com.mumi.reggie.service.DishService;
@@ -75,14 +76,32 @@ public class DishController{
     }
 
     @GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
+    public R<List<DishDto>> list(Dish dish){
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
         queryWrapper.eq(Dish::getStatus, 1);
         queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
 
         List<Dish> list = dishService.list(queryWrapper);
-        return R.success(list);
+
+        List<DishDto> dishDtoList = list.stream().map(item -> {
+            DishDto dishDto = new DishDto();
+
+            BeanUtils.copyProperties(item, dishDto);
+
+            Long dishId = dishDto.getId();
+
+            LambdaQueryWrapper<DishFlavor> queryWrapper1 = new LambdaQueryWrapper<>();
+            queryWrapper1.eq(DishFlavor::getDishId, dishId);
+
+            List<DishFlavor> dishFlavorList = dishFlavorService.list(queryWrapper1);
+
+            dishDto.setFlavors(dishFlavorList);
+
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return R.success(dishDtoList);
     }
 
 
