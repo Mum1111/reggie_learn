@@ -8,6 +8,9 @@ import com.mumi.reggie.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +26,16 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+
+    @Value("${spring.mail.nickname}")
+    private String nickname;
+
+    @Value("${spring.mail.username}")
+    private String sender;
 
     @PostMapping("/sendMsg")
     public R<String> sendPhoneMsg(@RequestBody User user, HttpSession httpSession) {
@@ -40,6 +53,31 @@ public class UserController {
 
 
         return R.error("短信发送失败");
+    }
+
+    @PostMapping("/sendEmail")
+    public R<String> emailLogin(@RequestBody User user) {
+        String email = user.getEmail();
+
+        if(StringUtils.isNotEmpty(email)) {
+            String code = ValidateCodeUtils.generateValidateCode(4).toString();
+            log.info("code={}", code);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(nickname + '<' + sender + '>');
+            message.setTo(email);
+            message.setSubject("你的邮件验证码");
+            // 发送邮件
+
+            String content = "【验证码】您的验证码为：" + code + " 。 验证码五分钟内有效，逾期作废。\n\n\n";
+
+            message.setText(content);
+
+            mailSender.send(message);
+
+            return R.success("验证码邮件发送成功");
+        }
+
+        return R.error("邮件发送失败");
     }
 
     @PostMapping("/login")
