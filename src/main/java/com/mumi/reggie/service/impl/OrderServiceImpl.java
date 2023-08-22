@@ -11,6 +11,7 @@ import com.mumi.reggie.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,11 +31,12 @@ public class OrderServiceImpl extends ServiceImpl<OrdersMapper, Orders> implemen
     @Autowired
     private AddressBookService addressBookService;
 
+    @Autowired
     private OrderDetailService orderDetailService;
 
     @Override
     @Transactional
-    public void submit(Orders orders) {
+    public void submit( Orders orders) {
         // 获取当前用户id信息
         Long userId = BaseContext.getCurrentId();
 
@@ -97,5 +99,6 @@ public class OrderServiceImpl extends ServiceImpl<OrdersMapper, Orders> implemen
         orderDetailService.saveBatch(orderDetails);
 
         // 清空购物车数据
+        shoppingCartService.remove(shoppingCartLambdaQueryWrapper);
     }
 }
