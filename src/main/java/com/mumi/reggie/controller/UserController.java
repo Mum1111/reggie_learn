@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -29,6 +31,9 @@ public class UserController {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private RedisTemplate<Object, Object> redisTemplate;
 
 
     @Value("${spring.mail.nickname}")
@@ -46,7 +51,8 @@ public class UserController {
             log.info("code={}", code);
 
             // 将生成的code存储到session中
-            httpSession.setAttribute(phone, code);
+//            httpSession.setAttribute(phone, code);
+            redisTemplate.opsForValue().set(phone, code, 5, TimeUnit.MINUTES);
 
             return R.success("手机验证码短信发送成功");
         }
@@ -86,7 +92,8 @@ public class UserController {
         // 判断验证码是否正确
         String phone = map.get("phone").toString();
         String code = map.get("code").toString();
-        Object codeSession = httpSession.getAttribute(phone);
+//        Object codeSession = httpSession.getAttribute(phone);
+        String codeSession =(String) redisTemplate.opsForValue().get(phone);
 
         if (code.equals(codeSession)) {
             // 判断手机号是否存在在数据库中
@@ -103,6 +110,7 @@ public class UserController {
             }
 
             httpSession.setAttribute("user", user.getId());
+            redisTemplate.delete(phone);
 
             return R.success(user);
         }
