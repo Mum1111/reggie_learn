@@ -13,9 +13,11 @@ import com.mumi.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,6 +32,9 @@ public class DishController{
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private RedisTemplate<String ,List<DishDto> > redisTemplate;
 
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto) {
@@ -77,6 +82,18 @@ public class DishController{
 
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish){
+        List<DishDto> dishDtoList = null;
+        // 查询redis中是否存在
+        String key = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
+
+        dishDtoList = redisTemplate.opsForValue().get(key);
+
+        if (dishDtoList != null) {
+        // 如果存在直接返回
+            return R.success(dishDtoList);
+        }
+        // 如果不存在则执行查询库操作
+
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
         queryWrapper.eq(Dish::getStatus, 1);
@@ -84,7 +101,7 @@ public class DishController{
 
         List<Dish> list = dishService.list(queryWrapper);
 
-        List<DishDto> dishDtoList = list.stream().map(item -> {
+        dishDtoList = list.stream().map(item -> {
             DishDto dishDto = new DishDto();
 
             BeanUtils.copyProperties(item, dishDto);
@@ -100,6 +117,8 @@ public class DishController{
 
             return dishDto;
         }).collect(Collectors.toList());
+        // 写入redis
+        redisTemplate.opsForValue().set(key, dishDtoList, 60 , TimeUnit.MINUTES);
 
         return R.success(dishDtoList);
     }
