@@ -17,7 +17,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -36,6 +35,7 @@ public class DishController{
 
     @Autowired
     private RedisTemplate<String ,List<DishDto> > redisTemplate;
+
 
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto) {
