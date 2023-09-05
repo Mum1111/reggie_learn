@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,9 @@ public class DishController{
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto) {
         dishService.saveWithFlavor(dishDto);
+        // 精确清理
+        String key = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus();
+        redisTemplate.delete(key);
         return R.success("新增菜品成功");
     }
 
@@ -82,7 +86,7 @@ public class DishController{
 
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish){
-        List<DishDto> dishDtoList = null;
+        List<DishDto> dishDtoList ;
         // 查询redis中是否存在
         String key = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
 
@@ -133,6 +137,15 @@ public class DishController{
     @PutMapping
     public R<String> update(@RequestBody DishDto dishDto){
         dishService.updateWithFlavor(dishDto);
+        // 清理所有的
+//        Set<String> keys = redisTemplate.keys("dish_*");
+//        if (keys != null) {
+//            redisTemplate.delete(keys);
+//        }
+        // 精确清理
+        String key = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus();
+        redisTemplate.delete(key);
+
         return R.success("更新成功");
     }
 }
