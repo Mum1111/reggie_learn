@@ -32,7 +32,10 @@ public class LoginCheckFilter implements Filter {
                 "/backend/**",
                 "/front/**",
                 "/common/**",
-                "/user/sendEmail"
+                "/user/sendEmail",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
         };
 
         Boolean check = check(URLList, requestURI);
